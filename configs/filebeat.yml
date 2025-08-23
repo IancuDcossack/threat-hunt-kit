@@ -1,0 +1,13 @@
+filebeat.inputs:
+- type: filestream
+  id: syslog
+  enabled: true
+  paths:
+    - /var/log/sample_logs/*.log
+
+output.elasticsearch:
+  hosts: ["elasticsearch:9200"]
+  indices:
+    - index: "filebeat-%{[agent.name]}-%{+yyyy.MM.dd}"
+
+setup.ilm.enabled: false

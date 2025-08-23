@@ -1,0 +1,136 @@
+# Threat Hunt Kit - Suricata Configuration
+
+# Set the default log directory
+default-log-dir: /var/log/nsm/suricata
+
+# Set your network variables. IMPORTANT: Adjust these for your environment!
+vars:
+  address-groups:
+    HOME_NET: "[192.168.0.0/16, 10.0.0.0/8, 172.16.0.0/12]"
+    EXTERNAL_NET: "any"
+  port-groups:
+    HTTP_PORTS: "80,443,8080,8443"
+    SHELLCODE_PORTS: "!80"
+    ORACLE_PORTS: 1521
+    SSH_PORTS: 22
+
+# Configure the type of alert and eve logs we will generate.
+outputs:
+  - eve-log:
+      enabled: yes
+      filetype: regular
+      filename: eve.json
+      # Control what events are logged to eve.json. Be selective to save space.
+      types:
+        - alert:
+            payload: yes       # Include the packet payload that triggered the alert
+            payload-buffer-size: 4kb
+            payload-printable: yes
+            metadata: yes       # Include rule metadata like classification
+        - http:
+            extended: yes       # Use the extended HTTP log format (more fields)
+        - dns:
+            # Answer RRs are the records returned by the DNS server.
+            query: yes          # Log the question
+            answer: yes         # Log the answer
+        - tls:
+            extended: yes       # Use the extended log format
+        - files:
+            force-magic: yes    # Force logging of files magic data
+            force-md5: yes      # Force MD5 calculation for all files
+        - smtp
+        - ssh
+        - stats:
+            totals: yes         # stats for all threads merged together
+            threads: no         # per-thread stats
+            deltas: no          # include delta values
+        - flow
+
+  # Console output is great for debugging and seeing alerts in real-time.
+  - console:
+      enabled: yes
+      #verbosity: 4  # 1-4, higher is more verbose. Good for testing.
+
+# Linux high speed capture support (af-packet)
+af-packet:
+  - interface: eth0  # Will be overridden by Docker command argument
+    cluster-id: 99
+    cluster-type: cluster_flow
+    defrag: yes
+    # Buffer size tuning. Increase if you have packet loss.
+    use-mmap: yes
+    tpacket-v3: yes
+    ring-size: 65536
+    block-size: 131072
+
+# Set the rule path globally and specify the sources.
+rule-files:
+  - local.rules    # Your custom rules - loaded FIRST so they take priority
+
+# Set the default rule path. Suricata will load all rules from this directory.
+default-rule-path: /var/lib/suricata/rules
+rule-files:
+  - suricata.rules
+
+# Configure the run mode. 'autofp' is best for multi-core systems.
+runmode: autofp
+
+# Logging configuration
+logging:
+  default-log-format: "[%i] %d - %m"
+  default-output-format: "%t - (%n:%v) - %m"
+  outputs:
+    - file:
+        enabled: yes
+        level: info
+        filename: suricata.log
+
+  - syslog:
+      enabled: no
+
+# Configure the app-layer protocols
+app-layer:
+  protocols:
+    tls:
+      enabled: yes
+      detection-ports:
+        dp: 443
+    http:
+      enabled: yes
+      detection-ports:
+        dp: 80, 8080, 8081, 8443, 8000, 9000
+
+# File extraction configuration - GREAT for threat hunting
+file-store:
+  enabled: no       # Set to 'yes' to extract files (be careful, uses disk space!)
+  log-dir: /var/log/nsm/suricata/files
+  force-magic: yes
+  force-filestore: yes
+  #waldo: "/tmp/waldo" # A specific file to watch for
+
+# Suricata can update rules itself. Disabled in Docker, but config is here.
+suricata-update:
+  enabled: no
+
+# PF_RING (optional, for extreme performance) - not used in this setup
+pfring:
+  - interface: eth0
+    cluster-id: 99
+    cluster-type: cluster_flow
+
+# Threading settings - good starting point for a 4-core system
+threading:
+  set-cpu-affinity: no
+  cpu-affinity:
+    - management-cpu-set:
+        cpu: [ 0 ]
+    - receive-cpu-set:
+        cpu: [ 0 ]
+    - worker-cpu-set:
+        cpu: [ 1,2,3 ]
+        mode: "exclusive"
+        prio:
+          low: [ 0 ]
+          medium: [ "1-2" ]
+          high: [ 3 ]
+          default: "medium"

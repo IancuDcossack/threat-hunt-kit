@@ -1,0 +1,43 @@
+# Threat Hunt Kit - Custom Suricata Rules
+# High-Fidelity Hunting & Detection Rules
+
+# --- Critical Infrastructure Access ---
+# Alert on any HTTP traffic to common admin panels from external IPs
+alert http $EXTERNAL_NET any -> $HOME_NET [80,443,8080,8443] (msg:"ET POLICY Possible Admin Panel Access"; flow:established,to_server; http.uri; content:"/admin/"; depth:7; nocase; http.uri; content:".php"; nocase; metadata: former_category POLICY; classtype:attempted-admin; sid:1000001; rev:1;)
+
+alert http $EXTERNAL_NET any -> $HOME_NET [80,443,8080,8443] (msg:"ET POLICY phpMyAdmin Access Attempt"; flow:established,to_server; http.uri; content:"/phpmyadmin/"; nocase; metadata: former_category POLICY; classtype:attempted-admin; sid:1000002; rev:1;)
+
+# --- Suspicious User-Agents ---
+# Common malware and scanner UAs
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"ET WEB_CLIENT Suspicious User-Agent (sqlmap)"; flow:established,to_server; http.user_agent; content:"sqlmap"; nocase; metadata: former_category WEB_CLIENT; classtype:web-application-attack; sid:1000003; rev:1;)
+
+alert http $EXTERNAL_NET any -> $HOME_NET any (msg:"ET WEB_CLIENT Suspicious User-Agent (nikto)"; flow:established,to_server; http.user_agent; content:"nikto"; nocase; metadata: former_category WEB_CLIENT; classtype:web-application-attack; sid:1000004; rev:1;)
+
+alert http any any -> any any (msg:"SUSPICIOUS User-Agent with Python Urllib"; flow:established,to_server; http.user_agent; content:"Python-urllib"; nocase; classtype:bad-unknown; sid:1000005; rev:1;)
+
+# --- Protocol Anomalies ---
+# HTTP requests with no Host header are often malicious
+alert http any any -> $HOME_NET any (msg:"ET POLICY HTTP Request Missing Host Header"; flow:established,to_server; http.header; content:"Host|3a|"; distance:0; within:5; negate:1; metadata: former_category POLICY; classtype:bad-unknown; sid:1000006; rev:1;)
+
+# SSL connection with a suspiciously old version
+alert tls any any -> any any (msg:"SUSPICIOUS SSL/TLS Version (SSLv3)"; tls.version; content:"0x0300"; classtype:protocol-command-decode; sid:1000007; rev:1;)
+
+# --- Internal Reconnaissance ---
+# Nmap NULL scan detection (a classic stealth scan)
+alert ip any any -> $HOME_NET any (msg:"ET SCAN Nmap NULL Scan"; fragbits:!D; fragbits:!M; ipopts:?; threshold: type limit, track by_src, count 1, seconds 60; classtype:attempted-recon; sid:1000008; rev:1;)
+
+# --- High-Severity Hunting ---
+# Detect potential reverse shell commands in HTTP parameters
+alert http any any -> $HOME_NET any (msg:"ET WEB_SPECIFIC_APPS Possible Reverse Shell Command in URI"; flow:established,to_server; http.uri; content:"/bin/bash"; nocase; http.uri; content:"&"; distance:0; within:10; metadata: former_category WEB_SPECIFIC_APPS; classtype:web-application-attack; sid:1000009; rev:1;)
+
+alert http any any -> $HOME_NET any (msg:"ET WEB_SPECIFIC_APPS Possible PowerShell Download Cradle in URI"; flow:established,to_server; http.uri; content:"System.Net.WebClient"; nocase; http.uri; content:"DownloadFile"; nocase; distance:0; within:20; metadata: former_category WEB_SPECIFIC_APPS; classtype:web-application-attack; sid:1000010; rev:1;)
+
+# --- Custom IOC Matching ---
+# Replace these IPs and domains with your own IOCs from rules/iocs.txt
+alert ip [94.102.61.25,185.225.73.244] any -> $HOME_NET any (msg:"CUSTOM IOC Malicious IP Detected"; classtype:bad-unknown; reference:url,threat-hunt-kit/iocs.txt; sid:1000011; rev:1;)
+
+alert dns any any -> any any (msg:"CUSTOM IOC Malicious Domain Query"; dns.query; content:"evil-domain.com"; nocase; classtype:bad-unknown; reference:url,threat-hunt-kit/iocs.txt; sid:1000012; rev:1;)
+
+# --- File-based Detection ---
+# Alert on HTTP response containing a PE file (Windows executable)
+alert http any any -> any any (msg:"ET WEB_CLIENT HTTP Response Containing Windows Executable"; flow:established,from_server; filemagic:"PE executable"; metadata: former_category WEB_CLIENT; classtype:bad-unknown; sid:1000013; rev:1;)

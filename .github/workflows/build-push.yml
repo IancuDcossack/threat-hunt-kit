@@ -1,0 +1,128 @@
+name: Build and Push Sensor Docker Image
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'Dockerfile'
+      - 'configs/**'
+      - 'scripts/**'
+      - '.github/workflows/build-push.yml'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - 'Dockerfile'
+      - 'configs/**'
+      - 'scripts/**'
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow publishing packages
+permissions:
+  contents: read
+  packages: write
+
+# This workflow uses a single job
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Build for both AMD64 and ARM64 architectures for full compatibility (laptops, Raspberry Pi, cloud)
+        platform: [ 'linux/amd64', 'linux/arm64' ]
+
+    steps:
+      # Step 1: Checkout the repository code
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # Step 2: Log in to GitHub Container Registry
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Step 3: Extract metadata (tags, labels) for Docker
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ghcr.io/${{ github.repository_owner }}/threat-hunt-sensor
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix=,suffix=,format=short
+
+      # Step 4: Set up QEMU for multi-architecture builds (enables building for ARM on AMD runners)
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      # Step 5: Set up Docker Buildx (the modern build engine that supports multi-arch)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      # Step 6: Cache Docker layers to dramatically speed up subsequent builds
+      - name: Cache Docker layers
+        uses: actions/cache@v4
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-
+
+      # Step 7: Build and push the Docker image for the current platform in the matrix
+      - name: Build and push
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ matrix.platform }}
+          push: ${{ github.event_name != 'pull_request' }} # Only push if not a PR
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache-new,mode=max
+
+      # Step 8: Test the built image by running a basic command
+      - name: Test built image
+        run: |
+          # Test on the native platform of the runner to avoid QEMU emulation issues for the test
+          docker run --rm -t \
+          --entrypoint=/bin/bash \
+          ghcr.io/${{ github.repository_owner }}/threat-hunt-sensor:latest \
+          -c "zeek -v && suricata -V && which tcpdump"
+
+      # Step 9: Update the cache for the next run
+      - name: Update Docker layer cache
+        if: ${{ github.event_name != 'pull_request' }}
+        run: |
+          rm -rf /tmp/.buildx-cache
+          mv /tmp/.buildx-cache-new /tmp/.buildx-cache
+
+      # Step 10: Create a summary of what was built and pushed
+      - name: Generate workflow summary
+        if: always()
+        run: |
+          echo "### Docker Image Build Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Event:** ${{ github.event_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Ref:** ${{ github.ref }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Image:** \`ghcr.io/${{ github.repository_owner }}/threat-hunt-sensor\`" >> $GITHUB_STEP_SUMMARY
+          echo "**Platforms Built:** ${{ matrix.platform }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "> ℹ️  Build was executed for a Pull Request. Image was **not pushed** to the registry." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "> ✅ Image was successfully built and pushed to GHCR." >> $GITHUB_STEP_SUMMARY
+          fi

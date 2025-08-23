@@ -1,0 +1,14 @@
+# Threat Hunt Kit - IOC List
+# Add indicators here, one per line.
+
+# Malicious IPs
+94.102.61.25
+185.225.73.244
+
+# Malicious Domains
+evil-domain.com
+malware-update.net
+
+# Malicious File Hashes
+c5c016b8d1c2df6d5a612f6c3365c6a6  # Example MD5
+aaf4c61ddcc5e8a2dabede0f3b482cd9aea9434d  # Example SHA1

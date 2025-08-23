@@ -14,7 +14,7 @@ services:
   # The SENSOR - Built from a custom Dockerfile for consistency
   sensor:
     <<: *base
-    image: ghcr.io/IancuDcossack/threat-hunt-kit
+    image: ghcr.io/iancudcossack/threat-hunt-kit
     container_name: threat-hunt-sensor
     hostname: sensor
     environment:

@@ -4,13 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c04d5b11-9821-4cd3-be32-a3c609ee6ac0" name="Changes" comment="Recommitted 0.1.1">
-      <change afterPath="$PROJECT_DIR$/scripts/log_analyzer.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs/snort.rules" beforeDir="false" afterPath="$PROJECT_DIR$/configs/snort.rules" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/configs/suricata.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/suricata.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-    </list>
+    <list default="true" id="c04d5b11-9821-4cd3-be32-a3c609ee6ac0" name="Changes" comment="Recommitted 0.1.1" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -92,7 +86,7 @@
       <workItem from="1755666475623" duration="5771000" />
       <workItem from="1755816175434" duration="24000" />
       <workItem from="1755978277841" duration="7739000" />
-      <workItem from="1755992935386" duration="2776000" />
+      <workItem from="1755992935386" duration="3501000" />
     </task>
     <task id="LOCAL-00001" summary="Recommitted 0.1.1">
       <option name="closed" value="true" />
@@ -118,7 +112,15 @@
       <option name="project" value="LOCAL" />
       <updated>1755992509091</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="Recommitted 0.1.1">
+      <option name="closed" value="true" />
+      <created>1756004104657</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1756004104657</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">

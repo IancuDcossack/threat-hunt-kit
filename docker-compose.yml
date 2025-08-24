@@ -1,56 +1,56 @@
 x-base: &base
   restart: unless-stopped
-  networks:
-    - nsm-net
+
 
 services:
   filebeat:
     image: docker.elastic.co/beats/filebeat:8.7.0
     volumes:
       - ./configs/filebeat.yml:/usr/share/filebeat/filebeat.yml
-      - ./scripts/sample_logs:/var/log/sample_logs
+      - ./scripts/sample_logs:/usr/share/filebeat/sample_logs
+      - ./logs/filebeat:/usr/share/filebeat/logs
     depends_on:
       - elasticsearch
-  # The SENSOR - Built from a custom Dockerfile for consistency
+    networks:
+      - nsm-net
+
+  # The SENSOR
   sensor:
     <<: *base
-    image: ghcr.io/iancudcossack/threat-hunt-kit
+    image: jasonish/suricata:latest
     container_name: threat-hunt-sensor
     hostname: sensor
     environment:
-      - INTERFACE=${INTERFACE:-eth0} # Read from .env file
+      - INTERFACE=${INTERFACE:-eth0}
     volumes:
-      - ./configs:/etc/nsm-configs
-      - ./rules:/etc/nsm-rules
-      - ./pcaps:/opt/pcaps
-      - ./logs:/var/log/nsm
+      - ./configs/suricata.yaml:/etc/suricata/suricata.yaml
+      - ./configs/snort.rules:/etc/suricata/rules/snort.rules
+      - ./logs/suricata:/var/log/suricata
     cap_add:
       - NET_ADMIN
       - NET_RAW
       - SYS_PTRACE
     security_opt:
       - seccomp=unconfined
-    # Key upgrade: Define the command based on what you want to do
-    command: tail -f /dev/null # Default: just sit idle
+    network_mode: "host"  # Added for Suricata to see network traffic
+    command: ["suricata", "-c", "/etc/suricata/suricata.yaml", "-i", "eth0"]
 
-  # The BRAIN - Now with authentication and persistence
+  # The BRAIN
   elasticsearch:
     <<: *base
     image: docker.elastic.co/elasticsearch/elasticsearch:8.9.0
     container_name: threat-hunt-es
     environment:
       - discovery.type=single-node
-      - ES_JAVA_OPTS=-Xms2g -Xmx2g
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-hunter2} # Change this!
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g  # Reduced memory
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-hunter2}
       - xpack.security.enabled=true
     volumes:
       - es-data:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+    networks:
+      - nsm-net
 
   kibana:
     <<: *base
@@ -64,19 +64,8 @@ services:
       - elasticsearch
     ports:
       - "5601:5601"
-
-  logstash:
-    <<: *base
-    image: docker.elastic.co/logstash/logstash:8.9.0
-    container_name: threat-hunt-logstash
-    environment:
-      - LS_JAVA_OPTS=-Xms1g -Xmx1g
-    volumes:
-      - ./configs/logstash/:/usr/share/logstash/pipeline/
-      - ./logs/:/var/log/nsm/  # So Logstash can read the logs
-    depends_on:
-      - elasticsearch
-    command: logstash -f /usr/share/logstash/pipeline/ --config.reload.automatic
+    networks:
+      - nsm-net
 
 volumes:
   es-data:

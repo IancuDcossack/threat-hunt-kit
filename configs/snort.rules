@@ -1,1 +1,4 @@
-alert tcp any any -> any any (msg:"Test Rule"; sid:1000001; rev:1;)
+
+alert icmp any any -> any any (msg:"ICMP Test Detection"; sid:1000001; rev:1;)
+alert tcp any any -> any 22 (msg:"SSH Connection Attempt"; sid:1000002; rev:1;)
+alert tcp any any -> any 80 (msg:"HTTP Request"; sid:1000003; rev:1;)

@@ -4,37 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c04d5b11-9821-4cd3-be32-a3c609ee6ac0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/.env" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.github/workflows/build-push.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/threat-hunt-kit.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Dockerfile" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/logstash/custom-filters.conf" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/logstash/scripts/zeek_field_mapper.rb" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/suricata/local.rules" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/suricata/reference.config" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/suricata/suricata.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/local.zeek" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/node.cfg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/scripts/detection/hunt-iocs.zeek" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/scripts/detection/weird-scan.zeek" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/scripts/enrichment/add-geodata.zeek" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/scripts/tuning/capture-loss.zeek" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/scripts/tuning/notice-policy.zeek" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/site/local-intel.zeek" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/configs/zeek/zeekctl.cfg" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rules/iocs.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rules/update-suricata-rules.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rules/update-zeek-iocs.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/live-capture.sh" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/pcap-analysis.sh" afterDir="false" />
+    <list default="true" id="c04d5b11-9821-4cd3-be32-a3c609ee6ac0" name="Changes" comment="Recommitted 0.1.1">
+      <change afterPath="$PROJECT_DIR$/scripts/log_analyzer.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/snort.rules" beforeDir="false" afterPath="$PROJECT_DIR$/configs/snort.rules" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/configs/suricata.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/configs/suricata.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/docker-compose.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -45,12 +20,30 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Dockerfile" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="master" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;IancuDcossack&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/IancuDcossack/threat-hunt-kit.git&quot;,
+    &quot;accountId&quot;: &quot;cbcb53a4-ea7a-4ff1-9adb-f9a111b70f27&quot;
+  }
+}</component>
   <component name="KubernetesApiPersistence">{}</component>
   <component name="KubernetesApiProvider">{
   &quot;isMigrated&quot;: true
@@ -70,6 +63,8 @@
   &quot;keyToString&quot;: {
     &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;master&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -96,10 +91,41 @@
       <updated>1755666473985</updated>
       <workItem from="1755666475623" duration="5771000" />
       <workItem from="1755816175434" duration="24000" />
+      <workItem from="1755978277841" duration="7739000" />
+      <workItem from="1755992935386" duration="2776000" />
     </task>
+    <task id="LOCAL-00001" summary="Recommitted 0.1.1">
+      <option name="closed" value="true" />
+      <created>1755990571832</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1755990571832</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Recommitted 0.1.1">
+      <option name="closed" value="true" />
+      <created>1755991254805</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1755991254805</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Recommitted 0.1.1">
+      <option name="closed" value="true" />
+      <created>1755992509091</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1755992509091</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Recommitted 0.1.1" />
+    <option name="LAST_COMMIT_MESSAGE" value="Recommitted 0.1.1" />
   </component>
 </project>
